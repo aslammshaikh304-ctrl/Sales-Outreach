@@ -1,10 +1,10 @@
-import AppLayout from "../components/layout/AppLayout";
-import StatCard from "../components/dashboard/StatCard";
-import LeadChart from "../components/charts/LeadChart";
-import SMTPHealthCard from "../components/dashboard/SMTPHealthCard";
-import ActivityTable from "../components/dashboard/ActivityTable";
+import AppLayout from "../../components/layout/AppLayout";
+import StatCard from "../../components/dashboard/StatCard";
+import LeadChart from "../../components/charts/LeadChart";
+import SMTPHealthCard from "../../components/dashboard/SMTPHealthCard";
+import ActivityTable from "../../components/dashboard/ActivityTable";
 
-import { getDashboardData } from "../lib/dashboard";
+import { getDashboardData } from "../../lib/dashboard";
 
 export default async function Home() {
   const data = await getDashboardData();
