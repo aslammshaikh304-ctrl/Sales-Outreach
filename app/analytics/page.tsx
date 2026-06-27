@@ -24,11 +24,11 @@ export default async function AnalyticsPage() {
 
         <AnalyticsStats stats={data.stats} />
 
-        <AnalyticsCharts charts={data.charts} />
+<AnalyticsCharts charts={data.charts} />
 
-        <AIInsights stats={data.stats} />
+<AIInsights stats={data.stats} />
 
-        <AnalyticsTable leads={data.leads} />
+<AnalyticsTable leads={data.leads} />
 
       </div>
     </AppLayout>
