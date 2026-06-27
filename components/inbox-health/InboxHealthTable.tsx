@@ -1,9 +1,10 @@
+import HealthBadge from "./HealthBadge";
+
 type SMTP = {
   id: string;
-  name: string;
   email: string;
-  dailyLimit: number;
-  dailySent: number;
+  sent: number;
+  limit: number;
   bounceRate: number;
   bounceCount: number;
   health: string;
@@ -11,10 +12,10 @@ type SMTP = {
   lastCheck: string;
 };
 
-export default function SMTPTable({
-  smtpAccounts,
+export default function InboxHealthTable({
+  smtpHealth,
 }: {
-  smtpAccounts: SMTP[];
+  smtpHealth: SMTP[];
 }) {
   return (
     <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
@@ -25,15 +26,15 @@ export default function SMTPTable({
             <th className="px-6 py-4">Sent</th>
             <th className="px-6 py-4">Limit</th>
             <th className="px-6 py-4">Bounce %</th>
+            <th className="px-6 py-4">Bounce</th>
             <th className="px-6 py-4">Health</th>
             <th className="px-6 py-4">Status</th>
             <th className="px-6 py-4">Last Check</th>
-            <th className="px-6 py-4"></th>
           </tr>
         </thead>
 
         <tbody>
-          {smtpAccounts.map((smtp) => (
+          {smtpHealth.map((smtp) => (
             <tr
               key={smtp.id}
               className="border-b border-zinc-800 last:border-none"
@@ -43,11 +44,11 @@ export default function SMTPTable({
               </td>
 
               <td className="px-6 py-5">
-                {smtp.dailySent}
+                {smtp.sent}
               </td>
 
               <td className="px-6 py-5">
-                {smtp.dailyLimit}
+                {smtp.limit}
               </td>
 
               <td className="px-6 py-5">
@@ -55,17 +56,11 @@ export default function SMTPTable({
               </td>
 
               <td className="px-6 py-5">
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    smtp.health === "Healthy"
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : smtp.health === "Warning"
-                      ? "bg-yellow-500/20 text-yellow-400"
-                      : "bg-red-500/20 text-red-400"
-                  }`}
-                >
-                  {smtp.health}
-                </span>
+                {smtp.bounceCount}
+              </td>
+
+              <td className="px-6 py-5">
+                <HealthBadge health={smtp.health} />
               </td>
 
               <td className="px-6 py-5">
@@ -84,12 +79,6 @@ export default function SMTPTable({
                 {smtp.lastCheck
                   ? new Date(smtp.lastCheck).toLocaleDateString()
                   : "-"}
-              </td>
-
-              <td className="px-6 py-5">
-                <button className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500">
-                  View
-                </button>
               </td>
             </tr>
           ))}
