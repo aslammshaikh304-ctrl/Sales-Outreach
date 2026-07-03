@@ -1,4 +1,4 @@
-export async function sendEmail(leadId: number) {
+export async function sendEmail(leadId: string) {
   const res = await fetch("http://localhost:5678/webhook/send-outreach", {
     method: "POST",
     headers: {

@@ -6,16 +6,31 @@ import LeadDetailsDrawer from "./LeadDetailsDrawer";
 import { sendBulkEmail } from "@/lib/sendBulkEmail";
 
 type Lead = {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   company: string;
   website: string;
   email: string;
   industry: string;
-  status: string;
+  services: string;
+  researchSummary: string;
+  personalizationHook: string;
+  generatedSubject: string;
+  generatedEmail: string;
   smtp: string;
+  sentDate: string;
+  followupCount: number;
+  replyStatus: string;
   lastActivity: string;
+  activityType: string;
+  replyDate: string;
+  sequenceStatus: string;
+  suppressionStatus: string;
+  suppressionReason: string;
+  bounceStatus: string;
+  bounceType: string;
+  status: string;
 };
 
 type Props = {
@@ -23,23 +38,30 @@ type Props = {
 };
 
 export default function LeadTable({ leads = [] }: Props) {
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedids, setSelectedids] =
+    useState<Lead | null>(null);
+
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] =
+    useState<string[]>([]);
+
   const [sendingBulk, setSendingBulk] = useState(false);
 
   const openDrawer = (lead: Lead) => {
-    setSelectedLead(lead);
+    console.log("OPENING LEAD:", lead);
+    console.log("LEAD ID:", lead.id);
+
+    setSelectedids(lead);
     setDrawerOpen(true);
   };
 
   const closeDrawer = () => {
     setDrawerOpen(false);
-    setSelectedLead(null);
+    setSelectedids(null);
   };
 
-  const toggleLead = (id: number) => {
+  const toggleLead = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id)
         ? prev.filter((item) => item !== id)
@@ -51,30 +73,33 @@ export default function LeadTable({ leads = [] }: Props) {
     if (selectedIds.length === leads.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(leads.map((lead) => lead.id));
+      setSelectedIds(
+        leads.map((lead) => String(lead.id))
+      );
     }
   };
-const handleBulkSend = async () => {
-  try {
-    setSendingBulk(true);
 
-    await sendBulkEmail(selectedIds);
+  const handleBulkSend = async () => {
+    try {
+      setSendingBulk(true);
 
-    alert("Emails sent successfully");
+      await sendBulkEmail(selectedids);
 
-    setSelectedIds([]);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send emails");
-  } finally {
-    setSendingBulk(false);
-  }
-};
+      alert("Emails sent successfully");
+
+      setSelectedIds([]);
+    } catch (err) {
+      console.error(err);
+
+      alert("Failed to send emails");
+    } finally {
+      setSendingBulk(false);
+    }
+  };
+
   return (
     <>
       <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-
-        {/* Toolbar */}
         <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-6 py-4">
           <h2 className="font-semibold text-white">
             Leads ({leads.length})
@@ -87,12 +112,14 @@ const handleBulkSend = async () => {
               </span>
 
               <button
-  onClick={handleBulkSend}
-  disabled={sendingBulk}
-  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
->
-  {sendingBulk ? "Sending..." : "Send Selected"}
-</button>
+                onClick={handleBulkSend}
+                disabled={sendingBulk}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+              >
+                {sendingBulk
+                  ? "Sending..."
+                  : "Send Selected"}
+              </button>
             </div>
           )}
         </div>
@@ -119,65 +146,78 @@ const handleBulkSend = async () => {
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">SMTP</th>
               <th className="px-6 py-4">Last Activity</th>
-              <th className="px-6 py-4 text-right">Action</th>
+              <th className="px-6 py-4 text-right">
+                Action
+              </th>
             </tr>
           </thead>
 
           <tbody>
-            {leads.map((lead) => (
-              <tr
-                key={lead.id}
-                className="border-b border-zinc-800 transition hover:bg-zinc-800/40"
-              >
-                <td className="px-4 py-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.includes(lead.id)}
-                    onChange={() => toggleLead(lead.id)}
-                    className="h-4 w-4 cursor-pointer accent-emerald-500"
-                  />
-                </td>
+            {leads.map((lead) => {
+              const leadId = String(lead.id);
 
-                <td className="px-6 py-4">
-                  <p className="font-medium text-white">
-                    {lead.firstName} {lead.lastName}
-                  </p>
-                </td>
+              return (
+                <tr
+                  key={leadId}
+                  className="border-b border-zinc-800 transition hover:bg-zinc-800/40"
+                >
+                  <td className="px-4 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(leadId)}
+                      onChange={() => toggleLead(leadId)}
+                      className="h-4 w-4 cursor-pointer accent-emerald-500"
+                    />
+                  </td>
 
-                <td className="px-6 py-4 text-zinc-300">
-                  {lead.company}
-                </td>
+                  <td className="px-6 py-4">
+                    <p className="font-medium text-white">
+                      {lead.firstName} {lead.lastName}
+                    </p>
+                  </td>
 
-                <td className="px-6 py-4 text-zinc-400">
-                  {lead.email}
-                </td>
+                  <td className="px-6 py-4 text-zinc-300">
+                    {lead.company}
+                  </td>
 
-                <td className="px-6 py-4 text-zinc-400">
-                  {lead.industry}
-                </td>
+                  <td className="px-6 py-4 text-zinc-400">
+                    {lead.email || "-"}
+                  </td>
 
-                <td className="px-6 py-4">
-                  <LeadStatusBadge status={lead.status} />
-                </td>
+                  <td className="px-6 py-4 text-zinc-400">
+                    {lead.industry || "-"}
+                  </td>
 
-                <td className="px-6 py-4 text-zinc-300">
-                  {lead.smtp}
-                </td>
+                  <td className="px-6 py-4">
+                    <LeadStatusBadge
+                      status={lead.status}
+                    />
+                  </td>
 
-                <td className="px-6 py-4 text-zinc-400">
-                  {lead.lastActivity || "-"}
-                </td>
+                  <td className="px-6 py-4 text-zinc-300">
+                    {lead.smtp || "-"}
+                  </td>
 
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => openDrawer(lead)}
-                    className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td className="px-6 py-4 text-zinc-400">
+                    {lead.lastActivity || "-"}
+                  </td>
+
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() =>
+                        openDrawer({
+                          ...lead,
+                          id: leadId,
+                        })
+                      }
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
 
             {leads.length === 0 && (
               <tr>
@@ -194,7 +234,7 @@ const handleBulkSend = async () => {
       </div>
 
       <LeadDetailsDrawer
-        lead={selectedLead}
+        lead={selectedids}
         open={drawerOpen}
         onClose={closeDrawer}
       />

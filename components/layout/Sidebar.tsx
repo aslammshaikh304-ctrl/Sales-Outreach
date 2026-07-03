@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const menus = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Leads", href: "/leads" },
+  { name: "Scrape Leads", href: "/scrape-leads" },
   { name: "Outreach", href: "/outreach" },
   { name: "Replies", href: "/replies" },
   { name: "SMTP", href: "/smtp" },
