@@ -1,5 +1,5 @@
 export async function getLeads() {
-  const res = await fetch("http://localhost:5678/webhook/leads", {
+  const res = await fetch("https://dashboard.tryringflow.com/webhook/leads", {
     cache: "no-store",
   });
 

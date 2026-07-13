@@ -1,6 +1,6 @@
 export async function getInboxHealthData() {
   const res = await fetch(
-    "http://localhost:5678/webhook/inbox-health",
+    "https://dashboard.tryringflow.com/webhook/inbox-health",
     {
       cache: "no-store",
     }

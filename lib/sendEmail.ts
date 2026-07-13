@@ -1,5 +1,5 @@
 export async function sendEmail(leadId: string) {
-  const res = await fetch("http://localhost:5678/webhook/send-outreach", {
+  const res = await fetch("https://dashboard.tryringflow.com/webhook/send-outreach", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

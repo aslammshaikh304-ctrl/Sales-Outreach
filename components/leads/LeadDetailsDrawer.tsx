@@ -128,7 +128,7 @@ export default function LeadDetailsDrawer({
       console.log("Updating Lead:", formData);
 
       const response = await fetch(
-        "http://localhost:5678/webhook/edit-lead",
+        "https://dashboard.tryringflow.com/webhook/edit-lead",
         {
           method: "POST",
 
@@ -217,7 +217,7 @@ export default function LeadDetailsDrawer({
       console.log("Deleting Lead ID:", lead.id);
 
       const response = await fetch(
-        "http://localhost:5678/webhook-test/delete-lead",
+        "https://dashboard.tryringflow.com/webhook/delete-lead",
         {
           method: "POST",
 

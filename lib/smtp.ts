@@ -1,6 +1,6 @@
 export async function getSMTPData() {
   const res = await fetch(
-    "http://localhost:5678/webhook/smtp-dashboard",
+    "https://dashboard.tryringflow.com/webhook/smtp-dashboard",
     {
       cache: "no-store",
     }

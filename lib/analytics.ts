@@ -1,6 +1,6 @@
 export async function getAnalyticsData() {
   const res = await fetch(
-    "http://localhost:5678/webhook/analytics-dashboard",
+    "https://dashboard.tryringflow.com/webhook/analytics-dashboard",
     {
       cache: "no-store",
     }

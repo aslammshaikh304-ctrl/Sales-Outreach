@@ -1,6 +1,6 @@
 export async function getOutreachData() {
   const res = await fetch(
-    "http://localhost:5678/webhook/outreach-dashboard",
+    "https://dashboard.tryringflow.com/webhook/outreach-dashboard",
     {
       cache: "no-store",
     }

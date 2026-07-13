@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const response = await fetch(
-      "http://localhost:5678/webhook/scrape-leads",
+      "https://dashboard.tryringflow.com/webhook/scrape-leads",  
       {
         method: "POST",
         headers: {

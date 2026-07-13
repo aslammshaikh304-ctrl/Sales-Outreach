@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     for (const leadId of leadIds) {
       const response = await fetch(
-        "http://localhost:5678/webhook/send-outreach",
+        "https://dashboard.tryringflow.com/webhook/send-outreach",
         {
           method: "POST",
           headers: {

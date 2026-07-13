@@ -1,6 +1,6 @@
 export async function getSettings() {
   const res = await fetch(
-    "http://localhost:5678/webhook/settings",
+    "https://dashboard.tryringflow.com/webhook/settings",
     {
       cache: "no-store",
     }

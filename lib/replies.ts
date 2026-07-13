@@ -1,6 +1,6 @@
 export async function getRepliesData() {
   const res = await fetch(
-    "http://localhost:5678/webhook/replies-dashboard",
+    "https://dashboard.tryringflow.com/webhook/replies-dashboard",
     {
       cache: "no-store",
     }
