@@ -83,7 +83,7 @@ export default function LeadTable({ leads = [] }: Props) {
     try {
       setSendingBulk(true);
 
-      await sendBulkEmail(selectedids);
+      await sendBulkEmail(selectedIds);
 
       alert("Emails sent successfully");
 
