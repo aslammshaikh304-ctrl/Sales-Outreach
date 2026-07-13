@@ -22,7 +22,7 @@ export default async function OutreachPage() {
 
         {/* Top Cards */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <CampaignStatus data={data.campaignStatus} />
+          <CampaignStatus />
           <ProgressCard
   sent={data.emailsSentToday}
   limit={data.dailyLimit}
