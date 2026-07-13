@@ -1,4 +1,4 @@
-export async function sendBulkEmail(leadIds: number[]) {
+export async function sendBulkEmail(leadIds: string[]) {
   const res = await fetch("/api/send-bulk-email", {
     method: "POST",
     headers: {
