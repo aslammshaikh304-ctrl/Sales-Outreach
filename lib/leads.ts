@@ -1,16 +1,25 @@
 export async function getLeads() {
-  const res = await fetch("https://dashboard.tryringflow.com/webhook/leads", {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    "https://dashboard.tryringflow.com/webhook/leads",
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!res.ok) {
+    return [];
+  }
 
   const text = await res.text();
 
-  console.log("LEADS RESPONSE:");
-  console.log(text);
-
   if (!text.trim()) {
-    throw new Error("Empty response from webhook");
+    return [];
   }
 
-  return JSON.parse(text);
+  try {
+    const data = JSON.parse(text);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
 }
