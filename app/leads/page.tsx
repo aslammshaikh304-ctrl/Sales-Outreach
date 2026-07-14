@@ -9,7 +9,21 @@ export default async function LeadsPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        
+        <div className="flex items-center justify-between">
+  <div>
+    <h1 className="text-5xl font-bold">Leads</h1>
+
+    <p className="mt-2 text-zinc-400">
+      Manage all your outreach leads
+    </p>
+  </div>
+
+  <button
+    className="rounded-lg bg-emerald-600 px-5 py-3 font-medium text-white hover:bg-emerald-500"
+  >
+    + Add Lead
+  </button>
+</div>
         <input
       
           type="text"
