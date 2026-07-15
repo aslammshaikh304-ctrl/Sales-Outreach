@@ -336,15 +336,7 @@ export default function LeadDetailsDrawer({
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
 
-                  <button
-                    onClick={() => {
-                      setFormData(lead);
-                      setEditing(false);
-                    }}
-                    className="rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-600"
-                  >
-                    Cancel
-                  </button>
+            
                 </>
               )}
 
