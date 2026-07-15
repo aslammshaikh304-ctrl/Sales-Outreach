@@ -1,11 +1,16 @@
-export type SMTPHealth = {
-  id: string;
-  email: string;
-  health: string;
-  status: string;
+export type InboxHealthResponse = {
+  stats: {
+    healthy: number;
+    warning: number;
+    critical: number;
+    totalSent: number;
+    totalBounce: number;
+    avgBounce: number;
+    nearLimit: number;
+  };
 };
 
-export async function getInboxHealthData(): Promise<SMTPHealth[]> {
+export async function getInboxHealthData(): Promise<InboxHealthResponse> {
   const res = await fetch(
     "https://dashboard.tryringflow.com/webhook/inbox-health",
     {
@@ -19,24 +24,9 @@ export async function getInboxHealthData(): Promise<SMTPHealth[]> {
 
   const data = await res.json();
 
-  console.log("Inbox Health Response:", data);
+  console.log(data);
 
-  let smtpHealth: any[] = [];
-
-  if (Array.isArray(data)) {
-    smtpHealth = data;
-  } else if (Array.isArray(data.smtpHealth)) {
-    smtpHealth = data.smtpHealth;
-  } else if (Array.isArray(data.data)) {
-    smtpHealth = data.data;
-  } else if (Array.isArray(data.results)) {
-    smtpHealth = data.results;
-  }
-
-  return smtpHealth.map((smtp, index) => ({
-    id: smtp.id ?? String(index),
-    email: smtp.email ?? "",
-    health: smtp.health ?? "Healthy",
-    status: smtp.status ?? "Active",
-  }));
+  return {
+    stats: data.stats,
+  };
 }
