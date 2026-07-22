@@ -1,3 +1,15 @@
+export type SMTP = {
+  name: string;
+  email: string;
+  dailyLimit: number;
+  dailySent: number;
+  remaining: number;
+  bounceCount: number;
+  bounceRate: number;
+  health: string;
+  status: string;
+};
+
 export type InboxHealthResponse = {
   stats: {
     healthy: number;
@@ -8,6 +20,8 @@ export type InboxHealthResponse = {
     avgBounce: number;
     nearLimit: number;
   };
+
+  smtps: SMTP[];
 };
 
 export async function getInboxHealthData(): Promise<InboxHealthResponse> {
@@ -22,11 +36,5 @@ export async function getInboxHealthData(): Promise<InboxHealthResponse> {
     throw new Error("Failed to load Inbox Health");
   }
 
-  const data = await res.json();
-
-  console.log(data);
-
-  return {
-    stats: data.stats,
-  };
+  return await res.json();
 }
