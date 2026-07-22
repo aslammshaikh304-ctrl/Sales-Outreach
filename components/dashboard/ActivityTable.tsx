@@ -16,7 +16,7 @@ export default function ActivityTable({ activities }: Props) {
         Recent Activity
       </h2>
 
-      <table className="w-full">
+      <table className="min-w-[640px] w-full">
         <thead className="border-b border-zinc-800 text-left text-sm text-zinc-500">
           <tr>
             <th className="pb-3">Lead</th>

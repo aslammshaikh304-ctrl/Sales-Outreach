@@ -8,7 +8,7 @@ export async function addLead(data: {
   services: string;
 }) {
   const response = await fetch(
-    "https://dashboard.tryringflow.com/webhook/add-lead",
+    "/api/leads",
     {
       method: "POST",
 
@@ -24,5 +24,5 @@ export async function addLead(data: {
     throw new Error("Failed to add lead");
   }
 
-  return await response.json();
+  return response.json();
 }

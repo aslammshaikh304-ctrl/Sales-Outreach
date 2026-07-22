@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import LeadStatusBadge from "./LeadStatusBadge";
 import { sendEmail } from "@/lib/sendEmail";
 import { deleteLead } from "@/lib/deleteLead";
+import { updateLead } from "@/lib/updateLead";
 
 type Lead = {
   id: string;
@@ -55,10 +56,6 @@ export default function LeadDetailsDrawer({
 
   const [formData, setFormData] = useState<Lead | null>(lead);
 
-  useEffect(() => {
-    setFormData(lead);
-    setEditing(false);
-  }, [lead]);
 
   const updateField = (
     field: keyof Lead,
@@ -97,26 +94,21 @@ export default function LeadDetailsDrawer({
   };
 
   const handleDeleteLead = async () => {
-  if (!lead) return;
-
-  const confirmed = confirm(
-    `Delete ${lead.firstName}? This cannot be undone.`
-  );
-
-  if (!confirmed) return;
-
-  try {
-    await deleteLead(lead.firstName);
-
-    alert("Lead deleted successfully");
-
-    onClose();
-    router.refresh();
-  } catch (error) {
-    console.error(error);
-    alert("Failed to delete lead");
-  }
-};
+    if (!lead || deleting) return;
+    if (!window.confirm(`Delete ${lead.firstName} ${lead.lastName}? This cannot be undone.`)) return;
+    try {
+      setDeleting(true);
+      await deleteLead(lead.id);
+      alert("Lead deleted successfully");
+      onClose();
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete lead");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!formData) return;
@@ -127,66 +119,7 @@ export default function LeadDetailsDrawer({
       console.log("Updating Lead ID:", formData.id);
       console.log("Updating Lead:", formData);
 
-      const response = await fetch(
-        "https://dashboard.tryringflow.com/webhook/edit-lead",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            id: String(formData.id),
-
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-
-            company: formData.company,
-            website: formData.website,
-            email: formData.email,
-
-            industry: formData.industry,
-            services: formData.services,
-
-            researchSummary: formData.researchSummary,
-            personalizationHook: formData.personalizationHook,
-
-            generatedSubject: formData.generatedSubject,
-            generatedEmail: formData.generatedEmail,
-
-            smtp: formData.smtp,
-            sentDate: formData.sentDate,
-
-            followupCount: formData.followupCount,
-
-            replyStatus: formData.replyStatus,
-
-            lastActivity: formData.lastActivity,
-            activityType: formData.activityType,
-
-            replyDate: formData.replyDate,
-
-            sequenceStatus: formData.sequenceStatus,
-
-            suppressionStatus: formData.suppressionStatus,
-            suppressionReason: formData.suppressionReason,
-
-            bounceStatus: formData.bounceStatus,
-            bounceType: formData.bounceType,
-
-            status: formData.status,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        console.error("Update error:", errorText);
-
-        throw new Error("Failed to update lead");
-      }
+      await updateLead({ ...formData });
 
       alert("Lead updated successfully");
 
@@ -202,56 +135,6 @@ export default function LeadDetailsDrawer({
     }
   };
 
-  const handleDelete = async () => {
-    if (!lead) return;
-
-    const confirmed = window.confirm(
-      `Delete ${lead.firstName} ${lead.lastName}?`
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setDeleting(true);
-
-      console.log("Deleting Lead ID:", lead.id);
-
-      const response = await fetch(
-        "https://dashboard.tryringflow.com/webhook/delete-lead",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            id: String(lead.id),
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-
-        console.error("Delete error:", errorText);
-
-        throw new Error("Failed to delete lead");
-      }
-
-      alert("Lead deleted successfully");
-
-      onClose();
-
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-
-      alert("Failed to delete lead");
-    } finally {
-      setDeleting(false);
-    }
-  };
 
   if (!formData) {
     return null;
@@ -267,7 +150,7 @@ export default function LeadDetailsDrawer({
       )}
 
       <div
-        className={`fixed right-0 top-0 z-50 h-screen w-[520px] border-l border-zinc-800 bg-zinc-900 shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-50 h-screen w-full max-w-[520px] border-l border-zinc-800 bg-zinc-900 shadow-2xl transition-transform duration-300 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -304,9 +187,10 @@ export default function LeadDetailsDrawer({
 
                   <button
   onClick={handleDeleteLead}
+  disabled={deleting}
   className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500"
 >
-  Delete
+  {deleting ? "Deleting..." : "Delete"}
 </button>
 
                   <button

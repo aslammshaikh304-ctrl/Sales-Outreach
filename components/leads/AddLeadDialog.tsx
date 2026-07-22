@@ -62,7 +62,7 @@ export default function AddLeadDialog({
         className="fixed inset-0 z-40 bg-black/70"
       />
 
-      <div className="fixed right-0 top-0 z-50 h-screen w-[500px] overflow-y-auto border-l border-zinc-800 bg-zinc-900 p-6">
+      <div className="fixed right-0 top-0 z-50 h-screen w-full max-w-[500px] overflow-y-auto border-l border-zinc-800 bg-zinc-900 p-6">
 
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold">

@@ -47,6 +47,11 @@ export default function LeadTable({ leads = [] }: Props) {
     useState<string[]>([]);
 
   const [sendingBulk, setSendingBulk] = useState(false);
+  const [query, setQuery] = useState("");
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleLeads = normalizedQuery
+    ? leads.filter((lead) => [lead.firstName, lead.lastName, lead.company, lead.email, lead.industry].some((value) => value?.toLowerCase().includes(normalizedQuery)))
+    : leads;
 
   const openDrawer = (lead: Lead) => {
     console.log("OPENING LEAD:", lead);
@@ -70,11 +75,11 @@ export default function LeadTable({ leads = [] }: Props) {
   };
 
   const toggleAll = () => {
-    if (selectedIds.length === leads.length) {
+    if (visibleLeads.length > 0 && visibleLeads.every((lead) => selectedIds.includes(String(lead.id)))) {
       setSelectedIds([]);
     } else {
       setSelectedIds(
-        leads.map((lead) => String(lead.id))
+        visibleLeads.map((lead) => String(lead.id))
       );
     }
   };
@@ -83,11 +88,9 @@ export default function LeadTable({ leads = [] }: Props) {
     try {
       setSendingBulk(true);
 
-      await sendBulkEmail(selectedIds);
-
-      alert("Emails sent successfully");
-
-      setSelectedIds([]);
+      const result = await sendBulkEmail(selectedIds);
+      setSelectedIds(result.failedIds);
+      alert(result.failedIds.length ? `${result.count} sent; ${result.failedIds.length} failed and remain selected.` : "Emails sent successfully");
     } catch (err) {
       console.error(err);
 
@@ -99,10 +102,18 @@ export default function LeadTable({ leads = [] }: Props) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Search leads..."
+        aria-label="Search leads"
+        className="mb-4 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none"
+      />
+      <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
         <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-6 py-4">
           <h2 className="font-semibold text-white">
-            Leads ({leads.length})
+            Leads ({visibleLeads.length})
           </h2>
 
           {selectedIds.length > 0 && (
@@ -131,8 +142,8 @@ export default function LeadTable({ leads = [] }: Props) {
                 <input
                   type="checkbox"
                   checked={
-                    leads.length > 0 &&
-                    selectedIds.length === leads.length
+                    visibleLeads.length > 0 &&
+                    visibleLeads.every((lead) => selectedIds.includes(String(lead.id)))
                   }
                   onChange={toggleAll}
                   className="h-4 w-4 cursor-pointer accent-emerald-500"
@@ -153,7 +164,7 @@ export default function LeadTable({ leads = [] }: Props) {
           </thead>
 
           <tbody>
-            {leads.map((lead) => {
+            {visibleLeads.map((lead) => {
               const leadId = String(lead.id);
 
               return (
@@ -219,7 +230,7 @@ export default function LeadTable({ leads = [] }: Props) {
               );
             })}
 
-            {leads.length === 0 && (
+            {visibleLeads.length === 0 && (
               <tr>
                 <td
                   colSpan={9}
@@ -234,6 +245,7 @@ export default function LeadTable({ leads = [] }: Props) {
       </div>
 
       <LeadDetailsDrawer
+        key={selectedids?.id ?? "none"}
         lead={selectedids}
         open={drawerOpen}
         onClose={closeDrawer}

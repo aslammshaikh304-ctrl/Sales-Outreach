@@ -3,7 +3,7 @@ import AppLayout from "../../components/layout/AppLayout";
 import InboxHealthStats from "../../components/inbox-health/InboxHealthStats";
 import RecommendationCard from "../../components/inbox-health/RecommendationCard";
 
-import { getInboxHealthData } from "@/lib/inboxHealth";
+import { getInboxHealthData, type SMTP } from "@/lib/inboxHealth";
 
 export default async function InboxHealthPage() {
   const data = await getInboxHealthData();
@@ -27,8 +27,8 @@ export default async function InboxHealthPage() {
         <InboxHealthStats stats={data.stats} />
 
         {/* SMTP Table */}
-        <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-          <table className="w-full">
+        <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
+          <table className="min-w-[900px] w-full">
             <thead className="border-b border-zinc-800 bg-zinc-950">
               <tr className="text-left text-sm text-zinc-400">
                 <th className="p-4">SMTP</th>
@@ -44,7 +44,7 @@ export default async function InboxHealthPage() {
             </thead>
 
             <tbody>
-              {data.smtps.map((smtp: any) => {
+              {data.smtps.map((smtp: SMTP) => {
                 const percent =
                   smtp.dailyLimit > 0
                     ? Math.round(

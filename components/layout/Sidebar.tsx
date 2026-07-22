@@ -19,7 +19,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 border-r border-zinc-800 bg-zinc-900 p-6">
+    <aside className="w-full shrink-0 border-b border-zinc-800 bg-zinc-900 p-4 lg:h-screen lg:w-64 lg:border-b-0 lg:border-r lg:p-6">
       <h1 className="text-2xl font-bold text-emerald-500">
         RingFlow
       </h1>
@@ -28,7 +28,7 @@ export default function Sidebar() {
         AI Outreach Engine
       </p>
 
-      <nav className="mt-10 space-y-2">
+      <nav className="mt-4 flex gap-2 overflow-x-auto lg:mt-10 lg:block lg:space-y-2">
         {menus.map((item) => {
           const active = pathname === item.href;
 
@@ -36,7 +36,7 @@ export default function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
-              className={`block rounded-lg px-4 py-3 transition ${
+              className={`block shrink-0 rounded-lg px-4 py-3 transition ${
                 active
                   ? "bg-emerald-600 text-white"
                   : "text-zinc-300 hover:bg-zinc-800 hover:text-white"

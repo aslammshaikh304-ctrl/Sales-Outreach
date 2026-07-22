@@ -3,6 +3,7 @@ export async function getSettings() {
     "https://dashboard.tryringflow.com/webhook/settings",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

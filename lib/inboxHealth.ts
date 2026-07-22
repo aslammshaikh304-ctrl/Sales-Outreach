@@ -29,6 +29,7 @@ export async function getInboxHealthData(): Promise<InboxHealthResponse> {
     "https://dashboard.tryringflow.com/webhook/inbox-health",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

@@ -15,13 +15,13 @@ export default function AnalyticsTable({
   leads: Lead[];
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-x-auto">
       <div className="border-b border-zinc-800 px-6 py-4">
         <h2 className="text-lg font-semibold">Recent Leads</h2>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="min-w-[760px] w-full">
           <thead className="border-b border-zinc-800 text-left text-sm text-zinc-400">
             <tr>
               <th className="px-6 py-4">Name</th>

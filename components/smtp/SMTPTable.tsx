@@ -39,8 +39,8 @@ export default function SMTPTable({
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-        <table className="w-full">
+      <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900">
+        <table className="min-w-[900px] w-full">
           <thead className="border-b border-zinc-800">
             <tr className="text-left text-sm text-zinc-400">
               <th className="px-6 py-4">Email</th>

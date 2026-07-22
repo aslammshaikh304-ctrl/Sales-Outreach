@@ -9,12 +9,7 @@ export default async function LeadsPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <LeadHeader />        <input
-      
-          type="text"
-          placeholder="Search leads..."
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-white outline-none"
-        />
+        <LeadHeader />
 
         {leads.length === 0 ? (
   <div className="rounded-lg border border-zinc-800 p-12 text-center text-zinc-400">

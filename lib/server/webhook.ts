@@ -1,0 +1,5 @@
+const TIMEOUT_MS = 25_000;
+export function webhookUrl(name: string) { const value = process.env[name]; if (!value) throw new Error(`${name} is not configured.`); const parsed = new URL(value); if (parsed.protocol !== "https:" && process.env.NODE_ENV === "production") throw new Error(`${name} must use HTTPS in production.`); return parsed.toString(); }
+export async function postWebhook(name: string, payload: unknown) { return fetch(webhookUrl(name), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS) }); }
+export function webhookError(caught: unknown) { if (caught instanceof Error && (caught.name === "TimeoutError" || caught.name === "AbortError")) return { message: "Upstream service timed out.", status: 504 }; if (caught instanceof Error && caught.message.includes("not configured")) return { message: caught.message, status: 503 }; return { message: "Upstream service could not be reached.", status: 502 }; }
+

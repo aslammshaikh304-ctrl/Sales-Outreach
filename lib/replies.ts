@@ -3,6 +3,7 @@ export async function getRepliesData() {
     "https://dashboard.tryringflow.com/webhook/replies-dashboard",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

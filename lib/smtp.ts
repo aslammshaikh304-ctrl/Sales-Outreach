@@ -3,6 +3,7 @@ export async function getSMTPData() {
     "https://dashboard.tryringflow.com/webhook/smtp-dashboard",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

@@ -3,6 +3,7 @@ export async function getAnalyticsData() {
     "https://dashboard.tryringflow.com/webhook/analytics-dashboard",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

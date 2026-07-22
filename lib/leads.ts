@@ -3,23 +3,26 @@ export async function getLeads() {
     "https://dashboard.tryringflow.com/webhook/leads",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 
   if (!res.ok) {
-    return [];
+    throw new Error(`Failed to load leads: ${res.status}`);
   }
 
   const text = await res.text();
 
   if (!text.trim()) {
-    return [];
+    throw new Error("Leads service returned an empty response.");
   }
 
   try {
     const data = JSON.parse(text);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
+    if (!Array.isArray(data)) throw new Error("Leads service returned invalid data.");
+    return data;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Leads service")) throw error;
+    throw new Error("Leads service returned invalid JSON.");
   }
 }

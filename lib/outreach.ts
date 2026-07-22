@@ -3,6 +3,7 @@ export async function getOutreachData() {
     "https://dashboard.tryringflow.com/webhook/outreach-dashboard",
     {
       cache: "no-store",
+        signal: AbortSignal.timeout(15_000),
     }
   );
 

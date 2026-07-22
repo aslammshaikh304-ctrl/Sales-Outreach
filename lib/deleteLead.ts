@@ -1,13 +1,13 @@
-export async function deleteLead(firstName: string) {
+export async function deleteLead(id: string) {
   const res = await fetch(
-    "https://dashboard.tryringflow.com/webhook/delete-lead",
+    "/api/leads/delete",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        firstName,
+        id,
       }),
     }
   );

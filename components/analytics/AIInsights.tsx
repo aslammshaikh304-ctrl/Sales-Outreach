@@ -1,5 +1,5 @@
 type Props = {
-  stats: any;
+  stats: { replyRate: number; healthySMTPs: number; averageBounce: number };
 };
 
 export default function AIInsights({ stats }: Props) {

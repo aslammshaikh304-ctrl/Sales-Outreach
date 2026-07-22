@@ -15,6 +15,8 @@ import {
   CartesianGrid,
 } from "recharts";
 
+type ChartPoint = Record<string, string | number>;
+
 const COLORS = [
   "#22c55e",
   "#3b82f6",
@@ -27,9 +29,9 @@ export default function AnalyticsCharts({
   charts,
 }: {
   charts: {
-    leadsByDay: any[];
-    repliesByDay: any[];
-    leadStatus: any[];
+    leadsByDay: ChartPoint[];
+    repliesByDay: ChartPoint[];
+    leadStatus: ChartPoint[];
   };
 }) {
   return (
@@ -85,7 +87,7 @@ export default function AnalyticsCharts({
                 nameKey="name"
                 outerRadius={90}
               >
-                {charts.leadStatus.map((_: any, index: number) => (
+                {charts.leadStatus.map((_, index) => (
                   <Cell
                     key={index}
                     fill={COLORS[index % COLORS.length]}
