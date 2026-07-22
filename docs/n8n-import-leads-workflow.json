@@ -1,0 +1,186 @@
+{
+  "name": "RingFlow - Import CSV Leads",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "import-leads",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7a324b75-bb08-4d69-8463-99d8c9874f01",
+      "name": "Import Leads Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-800, 0],
+      "webhookId": "393d999a-d0ea-44f8-a530-77a1e1e789f1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nif (!body || !Array.isArray(body.leads)) throw new Error('The leads field must be an array.');\nif (body.leads.length === 0) throw new Error('At least one lead is required.');\nif (body.leads.length > 5000) throw new Error('A maximum of 5000 leads may be imported at once.');\nconst fields = ['firstName','lastName','company','website','email','industry','services','leadId','status'];\nfor (const lead of body.leads) {\n  if (!lead || typeof lead !== 'object' || !fields.every((field) => typeof lead[field] === 'string')) {\n    throw new Error('Every lead must contain the expected string fields.');\n  }\n}\nreturn [{ json: { leads: body.leads, total: body.leads.length } }];"
+      },
+      "id": "f674020f-4457-49f7-a60e-b90dc57a870a",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-576, 0]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jp8wZDR7WTF_qaqCn9bWUipMqZpsnDru5FwitYZzM9c",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads Data",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "c23e168d-7eb4-4c2f-bbdf-91671150a509",
+      "name": "Load Existing Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [-352, 0],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $('Validate Payload').first().json;\nconst existing = $input.all().map((item) => item.json);\nconst norm = (value) => String(value ?? '').trim().toLowerCase().replace(/\\s+/g, ' ');\nconst normWebsite = (value) => norm(value).replace(/^https?:\\/\\//, '').replace(/^www\\./, '').replace(/\\/$/, '');\nconst emails = new Set(existing.map((row) => norm(row.Email)).filter(Boolean));\nconst websites = new Set(existing.map((row) => normWebsite(row.Website)).filter(Boolean));\nconst companies = new Set(existing.map((row) => norm(row['Business Name'])).filter(Boolean));\nconst seen = new Set();\nconst accepted = [];\nlet duplicates = 0;\nlet invalid = 0;\nfor (const raw of request.leads) {\n  const lead = { ...raw, email: norm(raw.email), website: String(raw.website ?? '').trim(), company: String(raw.company ?? '').trim() };\n  if (!lead.email && !lead.website && !lead.company) { invalid++; continue; }\n  if (lead.email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(lead.email)) { invalid++; continue; }\n  const key = lead.email ? `email:${lead.email}` : lead.website ? `website:${normWebsite(lead.website)}` : `company:${norm(lead.company)}`;\n  const exists = lead.email ? emails.has(lead.email) : lead.website ? websites.has(normWebsite(lead.website)) : companies.has(norm(lead.company));\n  if (seen.has(key) || exists) { duplicates++; continue; }\n  seen.add(key);\n  accepted.push(lead);\n}\nconst meta = { total: request.total, duplicates, invalid, valid: accepted.length };\nif (accepted.length === 0) return [{ json: { _skip: true, _meta: meta } }];\nreturn accepted.map((lead) => ({ json: { ...lead, _skip: false, _meta: meta } }));"
+      },
+      "id": "b9ed4db7-a1de-48e3-a736-0f58fc2c9f38",
+      "name": "Validate and Deduplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-128, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "04ea3b87-792d-4dc7-8b3a-d533152770a6",
+              "leftValue": "={{ $json._skip }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5a6a42c4-447d-4a43-83da-8dd7539338a1",
+      "name": "Any New Leads?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [96, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const meta = $input.first().json._meta;\nreturn [{ json: { success: true, summary: { total: meta.total, imported: 0, duplicates: meta.duplicates, invalid: meta.invalid, failed: 0 } } }];"
+      },
+      "id": "76c5cb42-827c-4c5a-a09d-a82a172035bc",
+      "name": "No New Leads Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [352, -128]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jp8wZDR7WTF_qaqCn9bWUipMqZpsnDru5FwitYZzM9c",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads Data",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead Id": "={{ $json.leadId }}",
+            "First Name": "={{ $json.firstName }}",
+            "Last Name": "={{ $json.lastName }}",
+            "Business Name": "={{ $json.company }}",
+            "Website": "={{ $json.website }}",
+            "Email": "={{ $json.email }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "Lead Id", "displayName": "Lead Id", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "First Name", "displayName": "First Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Last Name", "displayName": "Last Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Business Name", "displayName": "Business Name", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Website", "displayName": "Website", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Email", "displayName": "Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Status", "displayName": "Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7778c99f-8639-4586-b8ec-da79d1224f74",
+      "name": "Append New Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [352, 112],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.all();\nconst meta = $('Validate and Deduplicate').first().json._meta;\nconst failed = results.filter((item) => item.json.error || item.json.message?.toLowerCase?.().includes('error')).length;\nconst imported = Math.max(0, meta.valid - failed);\nreturn [{ json: { success: true, summary: { total: meta.total, imported, duplicates: meta.duplicates, invalid: meta.invalid, failed } } }];"
+      },
+      "id": "d9d087fd-3223-444f-a15e-109e627236a2",
+      "name": "Import Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [576, 112]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "08723739-7dbd-4cd1-a9b5-dad366bb1f44",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [816, 0]
+    }
+  ],
+  "connections": {
+    "Import Leads Webhook": { "main": [[{ "node": "Validate Payload", "type": "main", "index": 0 }]] },
+    "Validate Payload": { "main": [[{ "node": "Load Existing Leads", "type": "main", "index": 0 }]] },
+    "Load Existing Leads": { "main": [[{ "node": "Validate and Deduplicate", "type": "main", "index": 0 }]] },
+    "Validate and Deduplicate": { "main": [[{ "node": "Any New Leads?", "type": "main", "index": 0 }]] },
+    "Any New Leads?": {
+      "main": [
+        [{ "node": "No New Leads Summary", "type": "main", "index": 0 }],
+        [{ "node": "Append New Leads", "type": "main", "index": 0 }]
+      ]
+    },
+    "No New Leads Summary": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] },
+    "Append New Leads": { "main": [[{ "node": "Import Summary", "type": "main", "index": 0 }]] },
+    "Import Summary": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "active": false,
+  "versionId": "31908f20-d09b-48cd-bdaa-c23886194fbd",
+  "meta": { "templateCredsSetupCompleted": false },
+  "tags": []
+}
